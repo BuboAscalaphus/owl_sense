@@ -1,0 +1,10 @@
+/**:
+  camera_node:
+    ros__parameters:
+      resolution: 4K
+      fps: 15
+      fps_format: 30
+      jpeg_quality: 210
+      exposure_time: 1000
+      
+      
