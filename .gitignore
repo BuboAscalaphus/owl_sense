@@ -207,5 +207,4 @@ marimo/_lsp/
 __marimo__/
 
 # Ignore subfolder Calibration
-owl_sense/owl_sense/Calibration
-owl_sense/owl_sense/Calibration/*
+owl_sense/Calibration
