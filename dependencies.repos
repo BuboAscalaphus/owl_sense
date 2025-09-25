@@ -1,0 +1,5 @@
+repositories:
+  owl_msgs:
+    type: git
+    url: https://github.com/BuboAscalaphus/owl_msgs.git
+    version: main
