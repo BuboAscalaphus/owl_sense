@@ -304,7 +304,7 @@ class MultiCameraImageSaver(Node):
         if self.enabled:
             self._last_enable_true = t
             # Rising edge: open new session + force first frame for known cameras
-            if self._prev_enabled is not None and (not self._prev_enabled):
+            if self._prev_enabled is None or (self._prev_enabled is False):
                 self._pending_new_session = True
                 self._session_start_time = t
                 self._current_session_date = None
