@@ -36,7 +36,8 @@ class CameraAR082x:
         self.exposure_time = exposure_time
         self.exposure_mode = exposure_mode
         self.jpeg_quality = jpeg_quality
-
+	self.EHDR_EXPOSURE_MAX_NUMBER = 3
+	
     def open(self):
         """Open the camera device."""
         if not self.is_open:
@@ -95,11 +96,14 @@ class CameraAR082x:
             sdk.VX_ISP_IMAGE_PROPERTIES.ISP_IMAGE_JPEG_QUALITY,
             self.jpeg_quality)
         sdk.VxSetMaxFPS(self.vxcam, self.fps)
+        
         sdk.VxSetISPImageProcessing(self.vxcam, sdk.VX_ISP_IMAGE_PROPERTIES.ISP_IMAGE_EXPOSURE_MODE, self.exposure_mode)
-        if self.exposure_mode == 1:  # Manual exposure
+        sdk.VxSetISPImageProcessing(self.vxcam, sdk.VX_ISP_IMAGE_PROPERTIES.ISP_EHDR_EXPOSURE_MAX_NUMBER, self.EHDR_EXPOSURE_MAX_NUMBER)
+        
+        if self.exposure_mode == 1:  # Auto exposure
             sdk.VxSetISPImageProcessing(self.vxcam, sdk.VX_ISP_IMAGE_PROPERTIES.ISP_IMAGE_EXPOSURE_MAX_TIME, self.exposure_time)
-            sdk.VxSetISPImageProcessing(self.vxcam, sdk.VX_ISP_IMAGE_PROPERTIES.ISP_IMAGE_EXPOSURE_MIN_TIME, 100)
-        elif self.exposure_mode == 2:  # Auto exposure
+            sdk.VxSetISPImageProcessing(self.vxcam, sdk.VX_ISP_IMAGE_PROPERTIES.ISP_IMAGE_EXPOSURE_MIN_TIME, 10)
+        elif self.exposure_mode == 2:  # Fixed exposure, auto gain
             sdk.VxSetISPImageProcessing(self.vxcam, sdk.VX_ISP_IMAGE_PROPERTIES.ISP_IMAGE_EXPOSURE_TIME, self.exposure_time)
     def stop_streaming(self):
         sdk.VxStopStreaming(self.vxcam)

@@ -27,6 +27,7 @@ setup(
             'camera_node = owl_sense.camera_node:main',
             'image_subscriber = owl_sense.image_subscriber:main',
             'sensor_node = owl_sense.sensor_node:main',  # if used
+            'file_state_publisher = owl_sense.file_state_publisher:main',
         ],
     },
 )
