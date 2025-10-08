@@ -12,10 +12,17 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
+        # Launch files
         (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),
+        # Generic configs (keep existing)
         (os.path.join('share', package_name, 'config'), glob('config/*.yaml')),
+        # Per-camera configs (new)
+        (os.path.join('share', package_name, 'config', 'cameras'), glob('config/cameras/*.yaml')),
     ],
-    install_requires=['setuptools'],
+    install_requires=[
+        'setuptools',
+        'PyYAML',  # YAML support for per-camera driver files
+    ],
     zip_safe=True,
     maintainer='davide',
     maintainer_email='davide.botturi@prospecto.cloud',
@@ -31,3 +38,4 @@ setup(
         ],
     },
 )
+

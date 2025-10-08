@@ -1,0 +1,17 @@
+init:
+  # choose one: "compressed", "raw", or "both"
+  output: "compressed"
+
+pre_stream:
+  # These set the stream mode and typically require the stream stopped
+  resolution: "4K"        # or [3840, 2160]
+  fps_format: 30          # SDK mode/timing identifier
+
+runtime:
+  # These are safe to apply after start (and re-applied on restarts)
+  fps: 23
+  exposure_mode: 1        # 1=manual, 2=auto  (driver-defined)
+  exposure_time_us: 1000
+  jpeg_quality: 205
+  ehdr_exposure_max_number: 3
+
