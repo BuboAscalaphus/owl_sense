@@ -142,6 +142,12 @@ class FileStatePublisherStamped(Node):
             f"Publishing enabled  -> {self.enabled_topic} (BoolStamped)\n"
             f"Polling at {poll_hz:.1f} Hz"
         )
+
+        try:
+            self._poll_once(force_publish_if_first=True)
+        except Exception:
+            pass
+
         self.timer = self.create_timer(1.0 / poll_hz, self._poll_once)
 
     def _poll_once(self):
