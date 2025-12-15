@@ -1,0 +1,8 @@
+init:
+  url: "rtsp://localhost:8554/cam1"
+  output: "compressed"
+  fps: 30.0
+
+pre_stream: {}
+runtime:
+  fps: 30

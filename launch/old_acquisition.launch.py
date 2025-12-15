@@ -11,21 +11,13 @@ def generate_launch_description():
     pkg_dir = get_package_share_directory('owl_sense')
     default_cfg = os.path.join(pkg_dir, 'config', 'cameras', 'ar082.app.yaml')
 
-    # Argomento per il file di config (già c'era)
     camera_config_arg = DeclareLaunchArgument(
         'camera_config_path',
         default_value=default_cfg,
         description='Path to the camera YAML (not a ROS params file)'
     )
 
-    # 🔹 Nuovo argomento: quale driver usare (module:ClassName)
-    camera_impl_arg = DeclareLaunchArgument(
-        'camera_impl',
-        default_value='owl_sense.camera_ar082:CameraAR082x',
-        description='Camera implementation in the form module:ClassName'
-    )
-
-    # Discover camere come prima
+    # === FIX: discover cameras like your old file ===
     _, cameras = sdk.VxDiscoverCameraDevices()
     camera_nodes = []
 
@@ -42,21 +34,15 @@ def generate_launch_description():
                 namespace=f'camera{idx}',
                 output='screen',
                 parameters=[{
-                    # YAML "app"
+                    # <== THE ONLY REAL FIX
                     'driver_params_file': LaunchConfiguration('camera_config_path'),
-                    # 🔹 Driver dinamico, preso dal launch argument
-                    'camera_impl': LaunchConfiguration('camera_impl'),
-                    # Nome camera (come prima)
                     'camera_name': str(cam),
                 }],
             )
         )
 
-    # 🔹 Ricordati di includere anche camera_impl_arg qui
-    return LaunchDescription([
-        camera_config_arg,
-        camera_impl_arg,
-        *camera_nodes,
-    ])
+    return LaunchDescription([camera_config_arg, *camera_nodes])
+
+
 
 
