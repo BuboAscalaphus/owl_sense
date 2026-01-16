@@ -4,8 +4,12 @@ pre_stream:
   resolution: "4K"
   fps_format: 30
 runtime:
-  fps: 23
+  fps: 25
   exposure_mode: 1
+  exposure_min_time_us: 50
   exposure_time_us: 1000
-  jpeg_quality: 205
-  ehdr_exposure_max_number: 3
+  jpeg_quality: 210
+  ehdr_exposure_max_number: 2
+  ehdr_exposure_min_number: 1
+  ehdr_ratio_min: 13
+  ehdr_ratio_max: 25

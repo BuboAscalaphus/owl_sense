@@ -20,8 +20,8 @@ class CameraAR082x(CameraBase):
         self.format = None
         self.width = 0; self.height = 0
         # optional internal fallback defaults (used only if YAML omits them)
-        self._defaults = dict(resolution="4K", fps_format=15, fps=12,
-                              exposure_mode=1, exposure_time_us=1000, jpeg_quality=205)
+        self._defaults = dict(resolution="4K", fps_format=15, fps=10,
+                              exposure_mode=1, exposure_time_us=1000, jpeg_quality=205, ehdr_exposure_max_number=3, ehdr_exposure_min_number=1, ehdr_ratio_min=12, ehdr_ratio_max=24, exposure_min_time_us=100)
 
     def capabilities(self) -> Dict[str, set]:
         return {
@@ -55,7 +55,6 @@ class CameraAR082x(CameraBase):
         local = {**self._defaults, **cfg}
         self._resolve_res(local["resolution"])
         sdk.VxSetISPImageProcessingDefault(self.vxcam)
-        sdk.VxSetOSPProfileFlag(self.vxcam, sdk.VX_OSP_PROFILE_FLAG.ENABLED)
 
         want_raw = (self.output in ("raw", "both"))
         fmt_target = sdk.VX_IMAGE_FORMAT.VX_IMAGE_FORMAT_RAW8 if want_raw else sdk.VX_IMAGE_FORMAT.VX_IMAGE_FORMAT_MJPG
@@ -73,8 +72,13 @@ class CameraAR082x(CameraBase):
         # stash for runtime config
         self._fps          = int(local.get("fps", self._defaults["fps"]))
         self._exp_mode     = int(local.get("exposure_mode", self._defaults["exposure_mode"]))
+        self._exp_min_time_us = int(local.get("exposure_min_time_us", self._defaults["exposure_min_time_us"]))
         self._exp_time_us  = int(local.get("exposure_time_us", self._defaults["exposure_time_us"]))
         self._jpeg_quality = int(local.get("jpeg_quality", self._defaults["jpeg_quality"]))
+        self._ehdr_exposure_max_number = int(local.get("ehdr_exposure_max_number", self._defaults["ehdr_exposure_max_number"]))
+        self._ehdr_exposure_min_number = int(local.get("ehdr_exposure_min_number", self._defaults["ehdr_exposure_min_number"]))
+        self._ehdr_ratio_min = int(local.get("ehdr_ratio_min", self._defaults["ehdr_ratio_min"]))
+        self._ehdr_ratio_max = int(local.get("ehdr_ratio_max", self._defaults["ehdr_ratio_max"]))
 
     def start_streaming(self):
         sdk.VxStartStreaming(self.vxcam)
@@ -92,9 +96,13 @@ class CameraAR082x(CameraBase):
         sdk.VxSetMaxFPS(self.vxcam, int(local["fps"]))
         sdk.VxSetISPImageProcessing(self.vxcam, sdk.VX_ISP_IMAGE_PROPERTIES.ISP_IMAGE_EXPOSURE_MODE, int(local["exposure_mode"]))
         sdk.VxSetISPImageProcessing(self.vxcam, sdk.VX_ISP_IMAGE_PROPERTIES.ISP_EHDR_EXPOSURE_MAX_NUMBER, int(local["ehdr_exposure_max_number"]))
+        sdk.VxSetISPImageProcessing(self.vxcam, sdk.VX_ISP_IMAGE_PROPERTIES.ISP_EHDR_EXPOSURE_MIN_NUMBER, int(local.get("ehdr_exposure_min_number", 1)))
+        sdk.VxSetISPImageProcessing(self.vxcam, sdk.VX_ISP_IMAGE_PROPERTIES.ISP_EHDR_RATIO_MIN, int(local.get("ehdr_ratio_min", 12)))
+        sdk.VxSetISPImageProcessing(self.vxcam, sdk.VX_ISP_IMAGE_PROPERTIES.ISP_EHDR_RATIO_MAX, int(local.get("ehdr_ratio_max", 24)))   
+
         if int(local["exposure_mode"]) == 1:
             sdk.VxSetISPImageProcessing(self.vxcam, sdk.VX_ISP_IMAGE_PROPERTIES.ISP_IMAGE_EXPOSURE_MAX_TIME, int(local["exposure_time_us"]))
-            sdk.VxSetISPImageProcessing(self.vxcam, sdk.VX_ISP_IMAGE_PROPERTIES.ISP_IMAGE_EXPOSURE_MIN_TIME, 10)
+            sdk.VxSetISPImageProcessing(self.vxcam, sdk.VX_ISP_IMAGE_PROPERTIES.ISP_IMAGE_EXPOSURE_MIN_TIME, int(local.get("exposure_min_time_us", 100)))
         else:
             sdk.VxSetISPImageProcessing(self.vxcam, sdk.VX_ISP_IMAGE_PROPERTIES.ISP_IMAGE_EXPOSURE_TIME, int(local["exposure_time_us"]))
         sdk.VxSetISPImageProcessing(self.vxcam, sdk.VX_ISP_IMAGE_PROPERTIES.ISP_IMAGE_JPEG_QUALITY, int(local["jpeg_quality"]))
@@ -104,6 +112,7 @@ class CameraAR082x(CameraBase):
         self._exp_time_us = int(local["exposure_time_us"])
         self._jpeg_quality = int(local["jpeg_quality"])
         self._ehdr_exposure_max_number = int(local["ehdr_exposure_max_number"])
+        self._ehdr_exposure_min_number = int(local.get("ehdr_exposure_min_number", 1))
 
     def stop_streaming(self):
         sdk.VxStopStreaming(self.vxcam)
